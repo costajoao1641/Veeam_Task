@@ -15,7 +15,7 @@ def sync_folders(source, replica, log_file,interval):
         interval (int): Synchronization interval in seconds.
     """
     # Configure logging settings
-    logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S',handlers=[logging.FileHandler(log_file),logging.StreamHandler()])
 
     while True:
         try:
@@ -65,7 +65,7 @@ def main():
     parser.add_argument('source', type=str, help='Source folder path')
     parser.add_argument('replica', type=str, help='Replica folder path')
     parser.add_argument('--interval', type=int, default=60, help='Interval in seconds for synchronization (default: 60)')
-    parser.add_argument('--log', type=str, help='Path to log file (default: sync.log)')
+    parser.add_argument('--log', type=str, default="sync.log",help='Path to log file (default: sync.log)')
     args = parser.parse_args()
 
     source = args.source
