@@ -13,6 +13,6 @@ python sync_folders.py path_to_source_folder path_to_replica_folder --interval i
 ## Example:
 
 ```bash
-python sync_folders.py "C:\Users\costa\OneDrive\Ambiente de Trabalho\Veam\source" "C:\Users\costa\OneDrive\Ambiente de Trabalho\Veam\replica" --interval 20 --log sync.log
+python sync_folders.py "C:\Users\costa\Downloads\Veeam_Task\source" "C:\Users\costa\Downloads\Veeam_Task\replica" --interval 20 --log sync.log
 ```
 
