@@ -8,7 +8,11 @@ This Python script synchronizes the contents of two folders, ensuring that the r
 Run the script from the command line with the following syntax:
 
 ```bash
-python sync.py source_folder replica_folder --interval interval_seconds --log log_file
+python sync_folders.py path_to_source_folder path_to_replica_folder --interval interval_seconds --log log_file
+```
+## Example:
 
+```bash
+python sync_folders.py "C:\Users\costa\OneDrive\Ambiente de Trabalho\Veam\source" "C:\Users\costa\OneDrive\Ambiente de Trabalho\Veam\replica" --interval 20 --log sync.log
+```
 
-This condensed version focuses on the essential details of the script's functionality and provides a concise example for running it from the command line.
