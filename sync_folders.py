@@ -3,7 +3,7 @@ import shutil
 import time
 import argparse
 import logging
-
+import filecmp
 def sync_folders(source, replica, log_file,interval):
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
@@ -21,8 +21,11 @@ def sync_folders(source, replica, log_file,interval):
                 for file in files:
                     source_path_file = os.path.join(root, file)
                     replica_path_file = os.path.join(replica, os.path.relpath(source_path_file, source))
-                    # only copies it if the file does not exist or if there is a last modification in the original file later than the last modification in the replica file
-                    if not os.path.exists(replica_path_file) or os.path.getmtime(source_path_file) > os.path.getmtime(replica_path_file):
+                    #Cpies the file if:
+                    # the file does not exist 
+                    #if the original fila was updated
+                    #if the files are different
+                    if not os.path.exists(replica_path_file) or not filecmp.cmp(replica_path_file, source_path_file, shallow=False): #or os.path.getmtime(source_path_file) > os.path.getmtime(replica_path_file) 
                         shutil.copy2(source_path_file, replica_path_file)
                         logging.info(f"Copied {source_path_file} to {replica_path_file}")
 
