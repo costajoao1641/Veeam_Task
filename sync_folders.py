@@ -5,51 +5,62 @@ import argparse
 import logging
 import filecmp
 def sync_folders(source, replica, log_file,interval):
+    """
+    Synchronizes files and directories from the source folder to the replica folder.
+
+    Args:
+        source (str): Path to the source folder.
+        replica (str): Path to the replica folder.
+        log_file (str): Path to the log file.
+        interval (int): Synchronization interval in seconds.
+    """
+    # Configure logging settings
     logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
     while True:
         try:
+            # Iterate through each directory and file in the source folder
             for root, dirs, files in os.walk(source):
-                # create similar directories in replica folder if not already created
+                # Create directories in replica if they don't already exist
                 for dir in dirs:
                     source_path_dir=os.path.join(root, dir)
                     replica_path_dir = os.path.join(replica, os.path.relpath(source_path_dir, source))
-                    if not os.path.exists(replica_path_dir):# or os.path.getmtime(source_path_dir) > os.path.getmtime(replica_path_dir):
+                    if not os.path.exists(replica_path_dir):
                         os.makedirs(replica_path_dir)
                         logging.info(f"Created folder: {replica_path_dir} in replica_folder")
-                #copy files from source to replica folder
+                # Copy files from source to replica folder if they don't exist or if they differ
                 for file in files:
                     source_path_file = os.path.join(root, file)
                     replica_path_file = os.path.join(replica, os.path.relpath(source_path_file, source))
-                    #Cpies the file if:
-                    # the file does not exist 
-                    #if the original fila was updated
-                    #if the files are different
                     if not os.path.exists(replica_path_file) or not filecmp.cmp(replica_path_file, source_path_file, shallow=False): #or os.path.getmtime(source_path_file) > os.path.getmtime(replica_path_file) 
                         shutil.copy2(source_path_file, replica_path_file)
                         logging.info(f"Copied {source_path_file} to {replica_path_file}")
 
-            #after copying the files and creating the directories it is necessary to eliminate directories or files that were eliminated form the source folder
+            # Clean up files and directories in replica folder that don't exist in source folder
             for root, dirs, files in os.walk(replica):
                 for dir in dirs:
                     replica_path_dir=os.path.join(root, dir)
                     source_path_dir = os.path.join(source, os.path.relpath(replica_path_dir, replica))
-                    #deletes directory if it doesn't exist in source folder
                     if not os.path.exists(source_path_dir):
                         shutil.rmtree(replica_path_dir)
                         logging.warning(f"Removed folder: {replica_path_dir} from replica folder")
                 for file in files:
                     replica_path_file = os.path.join(root, file)
                     source_path_file = os.path.join(source, os.path.relpath(replica_path_file, replica))
-                    #deletes file if it doesn't exist in source folder
                     if not os.path.exists(source_path_file):
                         os.remove(replica_path_file)
                         logging.warning(f"Removed file: {replica_path_file} from replica folder")
+                        
+            # Wait for the specified interval before next synchronization
             time.sleep(interval)
+
         except Exception as e:
             logging.error(f"Error occurred: {e}")
 
 def main():
+    """
+    Main function to parse command-line arguments and start synchronization.
+    """
     parser = argparse.ArgumentParser(description='Folder Synchronization')
     parser.add_argument('source', type=str, help='Source folder path')
     parser.add_argument('replica', type=str, help='Replica folder path')
@@ -62,17 +73,18 @@ def main():
     interval = args.interval
     log_file = args.log
 
+    # Check if the source folder exists
     if not os.path.exists(source):
-        logging.error("Source folder does not exist.") # A folder will be created in the directory.") --- Não sei se faz sentido criar a source folder
-        #print("Source folder does not exist. A folder will be created in the directory.")
-        #os.makedirs(source(source))
-        #logging.info(f"Created source folder: {source}")
+        logging.error("Source folder does not exist. Please create the source folder and rerun the program.") 
+        return
+    
+    # Create replica folder if it doesn't exist
     if not os.path.exists(replica):
         logging.warning("Replica folder does not exist. A folder will be created in the directory.")
-        #print("Replica folder does not exist. A folder will be created in the directory.")
         os.makedirs(replica)
         logging.info(f"Created replica folder: {replica}")
 
+    # Start synchronization process
     sync_folders(source, replica, log_file,interval)
 
 if __name__ == "__main__":
