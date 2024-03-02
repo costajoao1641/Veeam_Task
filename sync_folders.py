@@ -32,7 +32,7 @@ def sync_folders(source, replica, log_file,interval):
                 for file in files:
                     source_path_file = os.path.join(root, file)
                     replica_path_file = os.path.join(replica, os.path.relpath(source_path_file, source))
-                    if not os.path.exists(replica_path_file) or not filecmp.cmp(replica_path_file, source_path_file, shallow=False): #or os.path.getmtime(source_path_file) > os.path.getmtime(replica_path_file) 
+                    if not os.path.exists(replica_path_file) or not filecmp.cmp(replica_path_file, source_path_file, shallow=False):
                         shutil.copy2(source_path_file, replica_path_file)
                         logging.info(f"Copied {source_path_file} to {replica_path_file}")
 
