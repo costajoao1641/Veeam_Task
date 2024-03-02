@@ -50,7 +50,7 @@ def sync_folders(source, replica, log_file,interval):
                     if not os.path.exists(source_path_file):
                         os.remove(replica_path_file)
                         logging.warning(f"Removed file: {replica_path_file} from replica folder")
-                        
+
             # Wait for the specified interval before next synchronization
             time.sleep(interval)
 
@@ -83,6 +83,11 @@ def main():
         logging.warning("Replica folder does not exist. A folder will be created in the directory.")
         os.makedirs(replica)
         logging.info(f"Created replica folder: {replica}")
+
+    # Create an empty log file if it doesn't exist
+    if not os.path.exists(log_file):
+        open(log_file, 'a').close()
+        
 
     # Start synchronization process
     sync_folders(source, replica, log_file,interval)
